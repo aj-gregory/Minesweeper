@@ -14,7 +14,7 @@ class Game
   end
 
   def winning?
-    board.all_explored?
+    @board.all_explored?
   end
 
   def play
@@ -26,15 +26,16 @@ class Game
     game_over = false
     until game_over
       puts "Which tile? (row, tile)"
-      tile = gets.comp.split(", ")
-      tile = @board.tiles[tile[0]][tile[1]]
+      tile_position = gets.chomp.split(", ")
+      tile_position.map! {|el| el.to_i }
+      tile = @board.tiles[tile_position[0]][tile_position[1]]
 
       puts "Flag or reveal? (f/r)"
       action = gets.chomp.downcase
         case action
-        when f
+        when "f"
           flag(tile)
-        when r
+        when "r"
           game_over = true if is_bomb?(tile)
           reveal(tile)
         end
@@ -54,6 +55,7 @@ end
 
 
 class Board
+  attr_accessor :tiles
 
   def initialize(size)
 
@@ -162,7 +164,7 @@ end
 
 
 class Tile
-  attr_accessor :board, :position, :neighbors, :bomb, :flagged, :adjacent_bombs
+  attr_accessor :board, :position, :neighbors, :bomb, :flagged, :adjacent_bombs, :explored
 
   def initialize(position)
     @position = position
@@ -174,8 +176,9 @@ class Tile
 
   def explore
     self.explored = true
+    check_neighboring_bombs
 
-    if neighboring_bombs == '_'
+    if @adjacent_bombs == '_'
       neighbors.each do |neighbor|
         next unless neighbor.display == '*'
         neighbor.explore
@@ -188,23 +191,28 @@ class Tile
   def display
     if @explored == false
       "*"
+    # elsif @explored
+  #     "_"
     elsif @flagged
       "F"
     elsif @bomb
-      "!"
+      "B"
     elsif !@bomb
       @adjacent_bombs
     end
   end
 
-  def neighboring_bombs
+  def check_neighboring_bombs
     num_bombs = 0
     @neighbors[0].position
     @neighbors.each do |neighbor|
       num_bombs += 1 if neighbor.bomb
     end
-    return '_' if num_bombs == 0
-    num_bombs.to_s
+    if num_bombs == 0
+      @adjacent_bombs = '_'
+    else
+      @adjacent_bombs = num_bombs.to_s
+    end
   end
 
 end
