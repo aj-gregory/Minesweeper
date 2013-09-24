@@ -139,9 +139,11 @@ class Board
   end
 
   def render
-    @tiles.each do |row|
+    puts "       0 1 2 3 4 5 6 7 8"
+    @tiles.each_with_index do |row, row_idx|
+      print "row: #{row_idx} "
       row.each do |tile|
-        print tile.display
+        print "#{tile.display} "
       end
       puts
     end
