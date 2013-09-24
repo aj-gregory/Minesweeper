@@ -10,11 +10,10 @@ class Game
 
   def flag(tile)
     tile.flagged = true
-    tile.explored = true
   end
 
   def winning?
-    @board.all_explored?
+    @board.player_wins?
   end
 
   def play
@@ -149,13 +148,28 @@ class Board
     end
   end
 
-  def all_explored?
+  def num_explored
+    tiles_explored = 0
     @tiles.each do |row|
       row.each do |tile|
-        return false if tile.explored == false
+        tiles_explored += 1 if tile.explored
       end
     end
-    true
+    tiles_explored
+  end
+
+  def num_flagged
+    tiles_flagged = 0
+    @tiles.each do |row|
+      row.each do |tile|
+        tiles_flagged += 1 if tile.flagged
+      end
+    end
+    tiles_flagged
+  end
+
+  def player_wins?
+   (num_explored + num_flagged) == @dimension ** 2
   end
 
 end
@@ -182,7 +196,8 @@ class Tile
 
     if @adjacent_bombs == '_'
       neighbors.each do |neighbor|
-        next unless neighbor.display == '*'
+        next if neighbor.explored
+        next if neighbor.flagged
         neighbor.explore
       end
     else
@@ -191,12 +206,10 @@ class Tile
   end
 
   def display
-    if @explored == false
-      "*"
-    # elsif @explored
-  #     "_"
-    elsif @flagged
+    if @flagged
       "F"
+    elsif @explored == false
+      "*"
     elsif @bomb
       "!"
     elsif !@bomb
