@@ -133,7 +133,7 @@ class Board
   def mark_fringe_squares
     @tiles.each do |row|
       row.each do |tile|
-        tile.neighboring_bombs
+        tile.check_neighboring_bombs
       end
     end
   end
@@ -196,7 +196,7 @@ class Tile
     elsif @flagged
       "F"
     elsif @bomb
-      "B"
+      "!"
     elsif !@bomb
       @adjacent_bombs
     end
