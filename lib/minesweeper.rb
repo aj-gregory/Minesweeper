@@ -125,8 +125,8 @@ class Board
       rand_tile = nil
 
       while bomb_tiles.include?(rand_tile) || rand_tile.nil?
-        rand_row = rand(9)
-        rand_col = rand(9)
+        rand_row = rand(@dimension)
+        rand_col = rand(@dimension)
         rand_tile = @tiles[rand_row][rand_col]
       end
 
@@ -200,11 +200,6 @@ class Board
 
 end
 
-
-
-
-
-
 class Tile
   attr_accessor :board, :position, :neighbors, :bomb, :flagged, :adjacent_bombs, :explored
 
@@ -267,3 +262,6 @@ class Tile
   end
 
 end
+
+my_game = Game.new
+my_game.play
