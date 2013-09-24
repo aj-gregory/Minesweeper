@@ -22,8 +22,8 @@ class Game
   end
 
   def play
-    # puts "What size board? (small/big)"
-    board_size = "small" #gets.chomp.downcase
+    puts "What size board? (small/big)"
+    board_size = gets.chomp.downcase
     @board = Board.new(board_size)
 
     game_over = false
@@ -66,7 +66,7 @@ class Board
 
     case size
     when "small"
-      @num_mines = 3 #fix this
+      @num_mines = 10
       @dimension = 9
     when "big"
       @num_mines = 40
@@ -144,25 +144,34 @@ class Board
   end
 
   def render
-    puts "       0 1 2 3 4 5 6 7 8"
+    print "      "
+    (0...@dimension).each do |i|
+      print "#{i.to_s.rjust(3, " ")}"
+    end
+    puts
     @tiles.each_with_index do |row, row_idx|
-      print "row: #{row_idx} "
+      print "row: #{row_idx.to_s.rjust(2, " ")} " #fix digits
       row.each do |tile|
-        print "#{tile.display} "
+        print "#{tile.display}  "
       end
       puts
     end
   end
 
   def final_render
-    puts "       0 1 2 3 4 5 6 7 8"
+    print "      "
+    (0...@dimension).each do |i|
+      print "#{i.to_s.rjust(3, " ")}"
+    end
+    puts
     @tiles.each_with_index do |row, row_idx|
-      print "row: #{row_idx} "
+      print "row: #{row_idx.to_s.rjust(2, " ")} " #fix digits
       row.each do |tile|
-        print "#{tile.display_bombs} "
+        print "#{tile.display_bombs}  "
       end
       puts
     end
+
   end
 
   def num_explored
