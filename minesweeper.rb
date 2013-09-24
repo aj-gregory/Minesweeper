@@ -6,10 +6,15 @@ class Game
 
   def reveal(tile)
     tile.explore
+    tile.flagged = false
   end
 
   def flag(tile)
-    tile.flagged = true
+    if @board.num_flagged >= @board.num_mines
+      puts "You're out of flags!"
+    else
+      tile.flagged = true
+    end
   end
 
   def winning?
@@ -20,10 +25,10 @@ class Game
     # puts "What size board? (small/big)"
     board_size = "small" #gets.chomp.downcase
     @board = Board.new(board_size)
-    @board.render
 
     game_over = false
     until game_over
+      @board.render
       puts "Which tile? (row, tile)"
       tile_position = gets.chomp.split(", ")
       tile_position.map! {|el| el.to_i }
@@ -38,12 +43,13 @@ class Game
           game_over = true if is_bomb?(tile)
           reveal(tile)
         end
-      @board.render
       if winning?
+        @board.final_render
         return "You win!"
       end
     end
-
+    @board.final_render
+    puts "BOMB!"
     puts "Game over."
   end
 
@@ -54,13 +60,13 @@ end
 
 
 class Board
-  attr_accessor :tiles
+  attr_accessor :tiles, :num_mines
 
   def initialize(size)
 
     case size
     when "small"
-      @num_mines = 10
+      @num_mines = 3 #fix this
       @dimension = 9
     when "big"
       @num_mines = 40
@@ -148,6 +154,17 @@ class Board
     end
   end
 
+  def final_render
+    puts "       0 1 2 3 4 5 6 7 8"
+    @tiles.each_with_index do |row, row_idx|
+      print "row: #{row_idx} "
+      row.each do |tile|
+        print "#{tile.display_bombs} "
+      end
+      puts
+    end
+  end
+
   def num_explored
     tiles_explored = 0
     @tiles.each do |row|
@@ -191,7 +208,7 @@ class Tile
   end
 
   def explore
-    self.explored = true
+    self.explored = true unless @bomb
     check_neighboring_bombs
 
     if @adjacent_bombs == '_'
@@ -210,8 +227,18 @@ class Tile
       "F"
     elsif @explored == false
       "*"
-    elsif @bomb
-      "!"
+    elsif !@bomb
+      @adjacent_bombs
+    end
+  end
+
+  def display_bombs
+    if @bomb
+      "B"
+    elsif @flagged
+      "F"
+    elsif @explored == false
+      "*"
     elsif !@bomb
       @adjacent_bombs
     end
